@@ -17,7 +17,7 @@ const formSchema = z.object({
     message: "Please describe your target audience.",
   }),
   mainServices: z.array(z.string()).min(1, {
-    message: "Please add at least one service or product.",
+    message: "Please add at least one service or product offering.",
   }),
   uniqueSellingPoints: z.string().min(10, {
     message: "Please describe what makes your business unique.",
