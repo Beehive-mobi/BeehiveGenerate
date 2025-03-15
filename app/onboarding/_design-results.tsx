@@ -4,25 +4,21 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Check, Download, Laptop, Smartphone, Tablet, Palette, Type, Layout, Code, Save } from "lucide-react"
-import type { WebsiteDesign, WebsiteCode, OnboardingData } from "../lib/schema"
+import { Check, Download, Laptop, Smartphone, Tablet, Palette, Type, Layout, Code } from "lucide-react"
+import type { WebsiteDesign, WebsiteCode } from "../lib/schema"
 import { generateWebsiteCode } from "../lib/ai-code-generator"
-import { saveDesign } from "../lib/design-actions"
 import CodeDisplay from "./code-display"
 import Image from "next/image"
-import { toast } from "@/hooks/use-toast"
 
 interface DesignResultsProps {
   designs: WebsiteDesign[]
-  onboardingData: OnboardingData
 }
 
-export default function DesignResults({ designs, onboardingData }: DesignResultsProps) {
+export default function DesignResults({ designs }: DesignResultsProps) {
   const [selectedDesign, setSelectedDesign] = useState<number | null>(null)
   const [viewMode, setViewMode] = useState("desktop")
   const [detailTab, setDetailTab] = useState("preview")
   const [isGeneratingCode, setIsGeneratingCode] = useState(false)
-  const [isSavingDesign, setIsSavingDesign] = useState(false)
   const [generatedCode, setGeneratedCode] = useState<WebsiteCode | null>(null)
   const [codeError, setCodeError] = useState<string | null>(null)
 
@@ -50,41 +46,6 @@ export default function DesignResults({ designs, onboardingData }: DesignResults
       setCodeError("There was an error generating the code. Please try again later.")
     } finally {
       setIsGeneratingCode(false)
-    }
-  }
-
-  const handleSaveDesign = async () => {
-    if (!selectedDesign) return
-
-    const design = designs.find((d) => d.id === selectedDesign)
-    if (!design) return
-
-    setIsSavingDesign(true)
-
-    try {
-      const result = await saveDesign(design, onboardingData)
-
-      if (result.success) {
-        toast({
-          title: "Design saved",
-          description: "Your design has been saved successfully.",
-        })
-      } else {
-        toast({
-          title: "Error saving design",
-          description: "There was an error saving your design. Please try again.",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      console.error("Error saving design:", error)
-      toast({
-        title: "Error saving design",
-        description: "There was an error saving your design. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSavingDesign(false)
     }
   }
 
@@ -291,21 +252,10 @@ export default function DesignResults({ designs, onboardingData }: DesignResults
             </TabsContent>
           </Tabs>
 
-          <div className="flex flex-wrap justify-end gap-4">
-            <Button
-              variant="outline"
-              className="border-beehive-black text-beehive-black hover:bg-beehive-light"
-              onClick={handleSaveDesign}
-              disabled={isSavingDesign}
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {isSavingDesign ? "Saving..." : "Save Design"}
-            </Button>
-
+          <div className="flex justify-end space-x-4">
             <Button variant="outline" className="border-beehive-black text-beehive-black hover:bg-beehive-light">
               Request Changes
             </Button>
-
             {!generatedCode && (
               <Button
                 onClick={handleGenerateCode}
@@ -316,7 +266,6 @@ export default function DesignResults({ designs, onboardingData }: DesignResults
                 {isGeneratingCode ? "Generating Code..." : "Generate Code"}
               </Button>
             )}
-
             <Button className="bg-beehive-yellow text-beehive-black hover:bg-beehive-hover">
               Continue with This Design
             </Button>
