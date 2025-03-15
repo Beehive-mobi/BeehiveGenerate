@@ -41,16 +41,16 @@ export default function OnboardingPage() {
       setFormData(updatedFormData)
 
       // Initialize database if not already done
-      if (!dbInitialized) {
-        try {
-          const result = await initializeDatabase()
-          if (result.success) {
-            setDbInitialized(true)
-          }
-        } catch (error) {
-          console.error("Error initializing database:", error)
-        }
-      }
+      // if (!dbInitialized) {
+      //   try {
+      //     const result = await initializeDatabase()
+      //     if (result.success) {
+      //       setDbInitialized(true)
+      //     }
+      //   } catch (error) {
+      //     console.error("Error initializing database:", error)
+      //   }
+      // }
 
       // Generate designs using AI
       setIsGenerating(true)
