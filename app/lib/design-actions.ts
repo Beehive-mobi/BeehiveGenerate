@@ -84,3 +84,35 @@ export async function getDesigns(userId?: string) {
   }
 }
 
+export async function getDesignById(id: string | number) {
+  try {
+    const design = await sql`
+      SELECT * FROM designs 
+      WHERE id = ${id}
+    `
+
+    if (design.length === 0) {
+      return { success: false, error: "Design not found" }
+    }
+
+    return { success: true, design: design[0] }
+  } catch (error) {
+    console.error("Error fetching design:", error)
+    return { success: false, error }
+  }
+}
+
+export async function deleteDesign(id: string | number) {
+  try {
+    await sql`
+      DELETE FROM designs 
+      WHERE id = ${id}
+    `
+
+    return { success: true }
+  } catch (error) {
+    console.error("Error deleting design:", error)
+    return { success: false, error }
+  }
+}
+

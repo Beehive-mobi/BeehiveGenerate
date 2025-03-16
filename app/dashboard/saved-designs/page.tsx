@@ -64,42 +64,48 @@ export default function SavedDesignsPage() {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {designs.map((design) => (
-            <Card key={design.id} className="overflow-hidden">
-              <CardHeader className="p-4">
-                <CardTitle className="text-lg">{design.design_name}</CardTitle>
-                <p className="text-sm text-gray-500">{design.company_name}</p>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="relative h-48 w-full">
-                  <Image
-                    src={design.preview_images?.desktop || "/placeholder.svg?height=400&width=600&text=Design+Preview"}
-                    alt={design.design_name}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between p-4">
-                <Button variant="outline" size="sm" asChild>
-                  <Link href={`/dashboard/designs/${design.id}`}>
-                    <Eye className="mr-2 h-4 w-4" /> View
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-beehive-yellow text-beehive-black hover:bg-beehive-hover"
-                  asChild
-                >
-                  <Link href={`/dashboard/designs/${design.id}/code`}>
-                    <Code className="mr-2 h-4 w-4" /> Generate Code
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+          {designs.map((design) => {
+            // Parse preview images if it's a string
+            const previewImages =
+              typeof design.preview_images === "string" ? JSON.parse(design.preview_images) : design.preview_images
+
+            return (
+              <Card key={design.id} className="overflow-hidden">
+                <CardHeader className="p-4">
+                  <CardTitle className="text-lg">{design.design_name}</CardTitle>
+                  <p className="text-sm text-gray-500">{design.company_name}</p>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="relative h-48 w-full">
+                    <Image
+                      src={previewImages?.desktop || "/placeholder.svg?height=400&width=600&text=Design+Preview"}
+                      alt={design.design_name}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-between p-4">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/dashboard/designs/${design.id}`}>
+                      <Eye className="mr-2 h-4 w-4" /> View
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-beehive-yellow text-beehive-black hover:bg-beehive-hover"
+                    asChild
+                  >
+                    <Link href={`/dashboard/designs/${design.id}/code`}>
+                      <Code className="mr-2 h-4 w-4" /> Generate Code
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            )
+          })}
         </div>
       )}
     </div>
