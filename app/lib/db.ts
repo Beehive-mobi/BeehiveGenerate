@@ -1,7 +1,9 @@
 import { neon } from "@neondatabase/serverless"
 
+console.log(process.env.DATABASE_URL!)
+
 // Create a SQL client with the connection string from environment variables
-export const sql = neon(process.env.DATABASE_URL!)
+export const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL!)
 
 // Function to initialize the database with required tables
 export async function initializeDatabase() {

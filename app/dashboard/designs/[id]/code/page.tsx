@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import * as React from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { getDesignById } from "@/app/lib/design-actions"
 import { Button } from "@/components/ui/button"
@@ -11,8 +12,15 @@ import { generateWebsiteCode } from "@/app/lib/ai-code-generator"
 import CodeDisplay from "@/app/onboarding/code-display"
 import type { WebsiteCode, WebsiteDesign } from "@/app/lib/schema"
 
-export default function DesignCodePage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function DesignCodePage({ params }: PageProps) {
   const router = useRouter()
+  const { id } = React.use(params)
   const [design, setDesign] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -22,8 +30,10 @@ export default function DesignCodePage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     const fetchDesign = async () => {
+      if (!id) return
+
       try {
-        const result = await getDesignById(params.id)
+        const result = await getDesignById(id)
         if (result.success) {
           setDesign(result.design)
         } else {
@@ -38,7 +48,7 @@ export default function DesignCodePage({ params }: { params: { id: string } }) {
     }
 
     fetchDesign()
-  }, [params.id])
+  }, [id])
 
   const handleGenerateCode = async () => {
     if (!design) return
@@ -105,7 +115,7 @@ export default function DesignCodePage({ params }: { params: { id: string } }) {
     <div className="container mx-auto py-8">
       <div className="flex items-center justify-between mb-6">
         <Button variant="outline" asChild>
-          <Link href={`/dashboard/designs/${params.id}`}>
+          <Link href={`/dashboard/designs/${id}`}>
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Design
           </Link>
         </Button>

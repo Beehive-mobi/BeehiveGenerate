@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import * as React from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { getDesignById, deleteDesign } from "@/app/lib/design-actions"
 import { Button } from "@/components/ui/button"
@@ -11,8 +12,15 @@ import Image from "next/image"
 import Link from "next/link"
 import { toast } from "@/hooks/use-toast"
 
-export default function DesignDetailPage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function DesignDetailPage({ params }: PageProps) {
   const router = useRouter()
+  const { id } = React.use(params)
   const [design, setDesign] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -20,8 +28,10 @@ export default function DesignDetailPage({ params }: { params: { id: string } })
 
   useEffect(() => {
     const fetchDesign = async () => {
+      if (!id) return
+
       try {
-        const result = await getDesignById(params.id)
+        const result = await getDesignById(id)
         if (result.success) {
           setDesign(result.design)
         } else {
@@ -36,7 +46,40 @@ export default function DesignDetailPage({ params }: { params: { id: string } })
     }
 
     fetchDesign()
-  }, [params.id])
+  }, [id])
+
+  const handleDeleteDesign = async () => {
+    if (!id) return
+
+    if (!confirm("Are you sure you want to delete this design? This action cannot be undone.")) {
+      return
+    }
+
+    try {
+      const result = await deleteDesign(id)
+
+      if (result.success) {
+        toast({
+          title: "Design deleted",
+          description: "Your design has been deleted successfully.",
+        })
+        router.push("/dashboard/saved-designs")
+      } else {
+        toast({
+          title: "Error deleting design",
+          description: "There was an error deleting your design. Please try again.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error deleting design:", error)
+      toast({
+        title: "Error deleting design",
+        description: "There was an error deleting your design. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
 
   if (isLoading) {
     return (
@@ -70,37 +113,6 @@ export default function DesignDetailPage({ params }: { params: { id: string } })
   const previewImages =
     typeof design.preview_images === "string" ? JSON.parse(design.preview_images) : design.preview_images
 
-  const handleDeleteDesign = async () => {
-    if (!confirm("Are you sure you want to delete this design? This action cannot be undone.")) {
-      return
-    }
-
-    try {
-      const result = await deleteDesign(params.id)
-
-      if (result.success) {
-        toast({
-          title: "Design deleted",
-          description: "Your design has been deleted successfully.",
-        })
-        router.push("/dashboard/saved-designs")
-      } else {
-        toast({
-          title: "Error deleting design",
-          description: "There was an error deleting your design. Please try again.",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      console.error("Error deleting design:", error)
-      toast({
-        title: "Error deleting design",
-        description: "There was an error deleting your design. Please try again.",
-        variant: "destructive",
-      })
-    }
-  }
-
   return (
     <div className="container mx-auto py-8">
       <div className="flex items-center justify-between mb-6">
@@ -110,7 +122,7 @@ export default function DesignDetailPage({ params }: { params: { id: string } })
           </Link>
         </Button>
         <Button className="bg-beehive-yellow text-beehive-black hover:bg-beehive-hover" asChild>
-          <Link href={`/dashboard/designs/${params.id}/code`}>
+          <Link href={`/dashboard/designs/${id}/code`}>
             <Code className="mr-2 h-4 w-4" /> Generate Code
           </Link>
         </Button>
@@ -274,7 +286,7 @@ export default function DesignDetailPage({ params }: { params: { id: string } })
             Delete Design
           </Button>
           <Button className="bg-beehive-yellow text-beehive-black hover:bg-beehive-hover" asChild>
-            <Link href={`/dashboard/designs/${params.id}/code`}>
+            <Link href={`/dashboard/designs/${id}/code`}>
               <Code className="mr-2 h-4 w-4" /> Generate Code
             </Link>
           </Button>
