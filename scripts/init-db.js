@@ -33,17 +33,42 @@ async function initializeDatabase() {
       )
     `
 
+    console.log("Creating website_code table...")
+
+    // Create website_code table if it doesn't exist
+    await sql`
+      CREATE TABLE IF NOT EXISTS website_code (
+        id SERIAL PRIMARY KEY,
+        design_id INTEGER NOT NULL,
+        html TEXT,
+        css TEXT,
+        javascript TEXT,
+        nextjs_components JSONB,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_design FOREIGN KEY (design_id) REFERENCES designs(id) ON DELETE CASCADE
+      )
+    `
+
     console.log("Database initialized successfully")
 
-    // Check if the table was created by querying its structure
-    const tableInfo = await sql`
+    // Check if the tables were created by querying their structure
+    const designsTableInfo = await sql`
       SELECT column_name, data_type 
       FROM information_schema.columns 
       WHERE table_name = 'designs'
     `
 
-    console.log("Table structure:")
-    console.table(tableInfo)
+    const codeTableInfo = await sql`
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_name = 'website_code'
+    `
+
+    console.log("Designs table structure:")
+    console.table(designsTableInfo)
+
+    console.log("Website code table structure:")
+    console.table(codeTableInfo)
 
     return { success: true }
   } catch (error) {

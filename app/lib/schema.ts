@@ -76,8 +76,8 @@ export const websiteDesignsSchema = z.array(websiteDesignSchema)
 
 // Website Code Schema (output from AI)
 export const websiteCodeSchema = z.object({
-  html: z.string(),
-  css: z.string(),
+  html: z.string().default(""),
+  css: z.string().default(""),
   javascript: z.string().optional(),
   nextjs: z
     .object({
@@ -100,7 +100,12 @@ export const websiteCodeSchema = z.object({
         }),
       ),
     })
-    .optional(),
+    .optional()
+    .default({
+      pages: [],
+      components: [],
+      styles: [],
+    }),
 })
 
 // Types derived from schemas

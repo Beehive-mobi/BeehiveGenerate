@@ -1,13 +1,13 @@
 import { neon } from "@neondatabase/serverless"
 
-console.log(process.env.DATABASE_URL!)
-
 // Create a SQL client with the connection string from environment variables
 export const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL!)
 
 // Function to initialize the database with required tables
 export async function initializeDatabase() {
   try {
+    console.log("Initializing database...")
+
     // Create designs table if it doesn't exist
     await sql`
       CREATE TABLE IF NOT EXISTS designs (
@@ -24,6 +24,20 @@ export async function initializeDatabase() {
         preview_images JSONB,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `
+
+    // Create website_code table if it doesn't exist
+    await sql`
+      CREATE TABLE IF NOT EXISTS website_code (
+        id SERIAL PRIMARY KEY,
+        design_id INTEGER NOT NULL,
+        html TEXT,
+        css TEXT,
+        javascript TEXT,
+        nextjs_components JSONB,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_design FOREIGN KEY (design_id) REFERENCES designs(id) ON DELETE CASCADE
       )
     `
 

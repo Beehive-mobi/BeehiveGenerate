@@ -1,12 +1,11 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Copy, Check, FileCode, Globe, Rocket, ExternalLink, Server } from "lucide-react"
+import { Copy, Check, Globe, Rocket, ExternalLink, Server } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -18,7 +17,7 @@ interface CodeDisplayProps {
 }
 
 export default function CodeDisplay({ code }: CodeDisplayProps) {
-  const [activeTab, setActiveTab] = useState("nextjs")
+  const [activeTab, setActiveTab] = useState("html")
   const [copied, setCopied] = useState<string | null>(null)
   const [isDeploying, setIsDeploying] = useState(false)
   const [isDeployed, setIsDeployed] = useState(false)
@@ -28,6 +27,26 @@ export default function CodeDisplay({ code }: CodeDisplayProps) {
   const [isDomainConnected, setIsDomainConnected] = useState(false)
   const [showDomainForm, setShowDomainForm] = useState(false)
   const [deploymentError, setDeploymentError] = useState<string | null>(null)
+
+  console.log(
+    "CodeDisplay received code structure:",
+    JSON.stringify(
+      {
+        html: typeof code.html,
+        css: typeof code.css,
+        javascript: typeof code.javascript,
+        nextjs: code.nextjs
+          ? {
+              pages: Array.isArray(code.nextjs.pages) ? code.nextjs.pages.length : "not array",
+              components: Array.isArray(code.nextjs.components) ? code.nextjs.components.length : "not array",
+              styles: Array.isArray(code.nextjs.styles) ? code.nextjs.styles.length : "not array",
+            }
+          : "undefined",
+      },
+      null,
+      2,
+    ),
+  )
 
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text)
@@ -74,12 +93,102 @@ export default function CodeDisplay({ code }: CodeDisplayProps) {
     <div className="mt-8">
       <h2 className="mb-6 text-2xl font-bold">Generated Website Code</h2>
 
-      <Tabs defaultValue="nextjs" onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs defaultValue="html" onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="html">HTML</TabsTrigger>
+          <TabsTrigger value="css">CSS</TabsTrigger>
+          <TabsTrigger value="javascript">JavaScript</TabsTrigger>
           <TabsTrigger value="nextjs">Next.js</TabsTrigger>
-          <TabsTrigger value="download">Download</TabsTrigger>
           <TabsTrigger value="deploy">Deploy</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="html">
+          <Card>
+            <CardHeader>
+              <CardTitle>HTML</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4 flex justify-end">
+                <Button variant="outline" size="sm" onClick={() => copyToClipboard(code.html || "", "html")}>
+                  {copied === "html" ? (
+                    <>
+                      <Check className="mr-2 h-4 w-4" /> Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-2 h-4 w-4" /> Copy
+                    </>
+                  )}
+                </Button>
+              </div>
+              <pre className="max-h-[500px] overflow-auto rounded-lg bg-gray-100 p-4 text-sm">
+                <code>{code.html || "No HTML code available"}</code>
+              </pre>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="css">
+          <Card>
+            <CardHeader>
+              <CardTitle>CSS</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4 flex justify-end">
+                <Button variant="outline" size="sm" onClick={() => copyToClipboard(code.css || "", "css")}>
+                  {copied === "css" ? (
+                    <>
+                      <Check className="mr-2 h-4 w-4" /> Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-2 h-4 w-4" /> Copy
+                    </>
+                  )}
+                </Button>
+              </div>
+              <pre className="max-h-[500px] overflow-auto rounded-lg bg-gray-100 p-4 text-sm">
+                <code>{code.css || "No CSS code available"}</code>
+              </pre>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="javascript">
+          <Card>
+            <CardHeader>
+              <CardTitle>JavaScript</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {code.javascript ? (
+                <>
+                  <div className="mb-4 flex justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => copyToClipboard(code.javascript || "", "javascript")}
+                    >
+                      {copied === "javascript" ? (
+                        <>
+                          <Check className="mr-2 h-4 w-4" /> Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="mr-2 h-4 w-4" /> Copy
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <pre className="max-h-[500px] overflow-auto rounded-lg bg-gray-100 p-4 text-sm">
+                    <code>{code.javascript}</code>
+                  </pre>
+                </>
+              ) : (
+                <div className="text-center py-8 text-gray-500">No JavaScript code was generated for this design.</div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="nextjs">
           <Card>
@@ -87,113 +196,119 @@ export default function CodeDisplay({ code }: CodeDisplayProps) {
               <CardTitle>Next.js Components</CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="pages" className="mt-4">
-                <TabsList>
-                  <TabsTrigger value="pages">Pages</TabsTrigger>
-                  <TabsTrigger value="components">Components</TabsTrigger>
-                  <TabsTrigger value="styles">Styles</TabsTrigger>
-                </TabsList>
+              {code.nextjs ? (
+                <Tabs defaultValue="pages" className="mt-4">
+                  <TabsList>
+                    <TabsTrigger value="pages">Pages</TabsTrigger>
+                    <TabsTrigger value="components">Components</TabsTrigger>
+                    <TabsTrigger value="styles">Styles</TabsTrigger>
+                  </TabsList>
 
-                <TabsContent value="pages">
-                  {code.nextjs?.pages.map((page, index) => (
-                    <div key={index} className="mb-6">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-medium">{page.name}</h3>
-                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(page.code, `page-${index}`)}>
-                          {copied === `page-${index}` ? (
-                            <>
-                              <Check className="mr-2 h-4 w-4" /> Copied
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="mr-2 h-4 w-4" /> Copy
-                            </>
-                          )}
-                        </Button>
+                  <TabsContent value="pages">
+                    {code.nextjs.pages && code.nextjs.pages.length > 0 ? (
+                      code.nextjs.pages.map((page, index) => (
+                        <div key={index} className="mb-6">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-lg font-medium">{page.name}</h3>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => copyToClipboard(page.code, `page-${index}`)}
+                            >
+                              {copied === `page-${index}` ? (
+                                <>
+                                  <Check className="mr-2 h-4 w-4" /> Copied
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="mr-2 h-4 w-4" /> Copy
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                          <pre className="max-h-[300px] overflow-auto rounded-lg bg-gray-100 p-4 text-sm">
+                            <code>{page.code}</code>
+                          </pre>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        No Next.js pages were generated for this design.
                       </div>
-                      <pre className="max-h-[300px] overflow-auto rounded-lg bg-gray-100 p-4 text-sm">
-                        <code>{page.code}</code>
-                      </pre>
-                    </div>
-                  ))}
-                </TabsContent>
+                    )}
+                  </TabsContent>
 
-                <TabsContent value="components">
-                  {code.nextjs?.components.map((component, index) => (
-                    <div key={index} className="mb-6">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-medium">{component.name}</h3>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => copyToClipboard(component.code, `component-${index}`)}
-                        >
-                          {copied === `component-${index}` ? (
-                            <>
-                              <Check className="mr-2 h-4 w-4" /> Copied
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="mr-2 h-4 w-4" /> Copy
-                            </>
-                          )}
-                        </Button>
+                  <TabsContent value="components">
+                    {code.nextjs.components && code.nextjs.components.length > 0 ? (
+                      code.nextjs.components.map((component, index) => (
+                        <div key={index} className="mb-6">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-lg font-medium">{component.name}</h3>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => copyToClipboard(component.code, `component-${index}`)}
+                            >
+                              {copied === `component-${index}` ? (
+                                <>
+                                  <Check className="mr-2 h-4 w-4" /> Copied
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="mr-2 h-4 w-4" /> Copy
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                          <pre className="max-h-[300px] overflow-auto rounded-lg bg-gray-100 p-4 text-sm">
+                            <code>{component.code}</code>
+                          </pre>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        No Next.js components were generated for this design.
                       </div>
-                      <pre className="max-h-[300px] overflow-auto rounded-lg bg-gray-100 p-4 text-sm">
-                        <code>{component.code}</code>
-                      </pre>
-                    </div>
-                  ))}
-                </TabsContent>
+                    )}
+                  </TabsContent>
 
-                <TabsContent value="styles">
-                  {code.nextjs?.styles.map((style, index) => (
-                    <div key={index} className="mb-6">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-medium">{style.name}</h3>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => copyToClipboard(style.code, `style-${index}`)}
-                        >
-                          {copied === `style-${index}` ? (
-                            <>
-                              <Check className="mr-2 h-4 w-4" /> Copied
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="mr-2 h-4 w-4" /> Copy
-                            </>
-                          )}
-                        </Button>
+                  <TabsContent value="styles">
+                    {code.nextjs.styles && code.nextjs.styles.length > 0 ? (
+                      code.nextjs.styles.map((style, index) => (
+                        <div key={index} className="mb-6">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-lg font-medium">{style.name}</h3>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => copyToClipboard(style.code, `style-${index}`)}
+                            >
+                              {copied === `style-${index}` ? (
+                                <>
+                                  <Check className="mr-2 h-4 w-4" /> Copied
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="mr-2 h-4 w-4" /> Copy
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                          <pre className="max-h-[300px] overflow-auto rounded-lg bg-gray-100 p-4 text-sm">
+                            <code>{style.code}</code>
+                          </pre>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        No Next.js styles were generated for this design.
                       </div>
-                      <pre className="max-h-[300px] overflow-auto rounded-lg bg-gray-100 p-4 text-sm">
-                        <code>{style.code}</code>
-                      </pre>
-                    </div>
-                  ))}
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="download">
-          <Card>
-            <CardHeader>
-              <CardTitle>Download Code</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
-                <Button className="flex items-center justify-center gap-2 bg-beehive-yellow text-beehive-black hover:bg-beehive-hover">
-                  <FileCode className="h-5 w-5" />
-                  Download Project
-                </Button>
-              </div>
-              <p className="mt-4 text-sm text-gray-500">
-                Note: In a production environment, these buttons would generate and download a zip file containing all
-                the necessary files for your website.
-              </p>
+                    )}
+                  </TabsContent>
+                </Tabs>
+              ) : (
+                <div className="text-center py-8 text-gray-500">No Next.js code was generated for this design.</div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -221,24 +336,8 @@ export default function CodeDisplay({ code }: CodeDisplayProps) {
                     >
                       {isDeploying ? (
                         <>
-                          <div className="mt-4 p-4 border rounded-lg bg-gray-50">
-                            <h4 className="font-semibold mb-2">Deployment in progress...</h4>
-                            <div className="space-y-3">
-                              <div className="flex items-center">
-                                <div className="w-5 h-5 mr-3 rounded-full animate-pulse bg-beehive-yellow"></div>
-                                <span>Preparing files</span>
-                              </div>
-                              <div className="flex items-center">
-                                <div className="w-5 h-5 mr-3 rounded-full animate-pulse bg-beehive-yellow"></div>
-                                <span>Uploading to Vercel</span>
-                              </div>
-                              <div className="flex items-center">
-                                <div className="w-5 h-5 mr-3 rounded-full animate-pulse bg-beehive-yellow"></div>
-                                <span>Building project</span>
-                              </div>
-                            </div>
-                          </div>
-                          {/*Deploying...*/}
+                          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+                          Deploying...
                         </>
                       ) : (
                         <>

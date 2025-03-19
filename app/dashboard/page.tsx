@@ -1,14 +1,14 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Layers, Code, Save, Settings } from "lucide-react"
+import { Layers, Code, Save, Settings, FileCode } from "lucide-react"
 
 export default function DashboardPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="mb-6 text-3xl font-bold">Dashboard</h1>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle>Saved Designs</CardTitle>
@@ -56,6 +56,23 @@ export default function DashboardPage() {
           <CardFooter>
             <Button asChild className="w-full bg-beehive-yellow text-beehive-black hover:bg-beehive-hover">
               <Link href="/dashboard/saved-designs">Select Design</Link>
+            </Button>
+          </CardFooter>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Generated Code</CardTitle>
+            <CardDescription>View and manage your generated website code</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-center py-6">
+              <FileCode className="h-12 w-12 text-beehive-yellow" />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button asChild className="w-full bg-beehive-yellow text-beehive-black hover:bg-beehive-hover">
+              <Link href="/dashboard/code">View Generated Code</Link>
             </Button>
           </CardFooter>
         </Card>

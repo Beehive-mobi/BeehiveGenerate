@@ -12,26 +12,33 @@ export async function generateWebsiteCode(design: WebsiteDesign): Promise<Websit
       html: z.string(),
       css: z.string(),
       javascript: z.string().optional(),
-      nextjs: z.object({
-        pages: z.array(
-          z.object({
-            name: z.string(),
-            code: z.string(),
-          }),
-        ),
-        components: z.array(
-          z.object({
-            name: z.string(),
-            code: z.string(),
-          }),
-        ),
-        styles: z.array(
-          z.object({
-            name: z.string(),
-            code: z.string(),
-          }),
-        ),
-      }),
+      nextjs: z
+        .object({
+          pages: z.array(
+            z.object({
+              name: z.string(),
+              code: z.string(),
+            }),
+          ),
+          components: z.array(
+            z.object({
+              name: z.string(),
+              code: z.string(),
+            }),
+          ),
+          styles: z.array(
+            z.object({
+              name: z.string(),
+              code: z.string(),
+            }),
+          ),
+        })
+        .optional()
+        .default({
+          pages: [],
+          components: [],
+          styles: [],
+        }),
     })
 
     // Create a detailed prompt for the AI
@@ -83,7 +90,7 @@ export async function generateWebsiteCode(design: WebsiteDesign): Promise<Websit
       prompt,
     })
 
-    console.log('Code result: ', result.object)
+    console.log(result.object)
 
     return result.object
   } catch (error) {
