@@ -78,6 +78,7 @@ export async function generateWebsiteCode(design: WebsiteDesign): Promise<Websit
        - Styles: globals.css and tailwind.config.js
     
     Make sure the code is modern, responsive, accessible, and follows best practices.
+    Make sure import componets and file name is imported correctly.
     Use Tailwind CSS for styling in the Next.js implementation.
     Include proper comments to explain the code.
     Ensure all components work together correctly.

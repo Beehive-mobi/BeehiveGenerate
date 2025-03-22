@@ -51,6 +51,30 @@ export async function deployToVercel(code: WebsiteCode): Promise<VercelDeploymen
           data: Buffer.from(style.code).toString('base64'),
           encoding: 'base64'
         })) || []),
+
+        {
+          file: 'package.json',
+          data: Buffer.from(JSON.stringify({
+            name: "beehive-website",
+            version: "0.1.0",
+            private: true,
+            scripts: {
+              dev: "next dev",
+              build: "next build",
+              start: "next start",
+              lint: "next lint"
+            },
+            dependencies:  {
+              "next": "latest",
+              "react": "latest",
+              "react-dom": "latest"
+            },
+            devDependencies:{}
+          }, null, 2)).toString('base64'),
+          encoding: 'base64'
+        }
+
+        
       ],
       // Settings for the Vercel project
       projectSettings: {
@@ -85,8 +109,8 @@ export async function deployToVercel(code: WebsiteCode): Promise<VercelDeploymen
     //await new Promise((resolve) => setTimeout(resolve, 2000))
 
     return {
+      ...data,
       success: true,
-      url: `beehive-${Math.floor(Math.random() * 10000)}.vercel.app`,
     }
   } catch (error) {
     console.error("Error deploying to Vercel:", error)
