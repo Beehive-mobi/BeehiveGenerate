@@ -26,26 +26,30 @@ export async function deployToVercel(code: WebsiteCode): Promise<VercelDeploymen
     // Prepare the deployment payload
     // In a real implementation, we would need to create actual files from the code
     // and create a project structure that Vercel can deploy
+   
     const deploymentPayload = {
       name: `beehive-website-${Date.now()}`,
       files: [
         // Convert code object to files that Vercel can deploy
-        // For each component in code.nextjs.components, create a file in components/
+        // For each component in code.nextjs.components, create a file
         ...(code.nextjs?.components.map((component) => ({
           file: `components/${component.name}`,
-          content: component.code,
+          data: Buffer.from(component.code).toString('base64'),
+          encoding: 'base64'
         })) || []),
-
-        // For each page in code.nextjs.pages, create a file in pages/
+    
+        // For each page in code.nextjs.pages, create a file
         ...(code.nextjs?.pages.map((page) => ({
           file: `pages/${page.name}`,
-          content: page.code,
+          data: Buffer.from(page.code).toString('base64'),
+          encoding: 'base64'
         })) || []),
-
-        // For each style in code.nextjs.styles, create a file in styles/
+    
+        // For each style in code.nextjs.styles, create a file
         ...(code.nextjs?.styles.map((style) => ({
           file: `styles/${style.name}`,
-          content: style.code,
+          data: Buffer.from(style.code).toString('base64'),
+          encoding: 'base64'
         })) || []),
       ],
       // Settings for the Vercel project
@@ -60,20 +64,25 @@ export async function deployToVercel(code: WebsiteCode): Promise<VercelDeploymen
 
     // In a production implementation, we would make an API call to Vercel
     // For this demo, we'll simulate a successful deployment
-    // const response = await fetch('https://api.vercel.com/v13/deployments', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': `Bearer ${process.env.VERCEL_API_TOKEN}`
-    //   },
-    //   body: JSON.stringify(deploymentPayload)
-    // })
-    //
-    // const data = await response.json()
-    // const validatedData = vercelDeployResponseSchema.parse(data)
+    const response = await fetch('https://api.vercel.com/v13/deployments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.VERCEL_API_TOKEN}`
+        //'Authorization': `Bearer ${process.env.VERCEL_API_TOKEN}`
+      },
+      body: JSON.stringify(deploymentPayload)
+    })
+    
 
+
+    const data = await response.json()
+    console.log(data)
+    //const validatedData = vercelDeployResponseSchema.parse(data)
+
+    //console.log(validatedData)
     // For demo: simulate a successful deployment
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    //await new Promise((resolve) => setTimeout(resolve, 2000))
 
     return {
       success: true,

@@ -47,6 +47,7 @@ export default function CodeVersionPage({ params }: PageProps) {
         const data = await result.json()
 
         if (data.success) {
+          console.log(data)
           setCode(data.code)
           setDesignId(data.designId)
         } else {
