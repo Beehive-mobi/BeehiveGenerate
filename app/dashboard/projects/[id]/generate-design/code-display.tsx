@@ -9,8 +9,10 @@ import { Copy, Check, Globe, Rocket, ExternalLink, Server } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import type { WebsiteCode } from "../lib/schema"
-import { deployToVercel } from "../lib/deploy-actions"
+import type { WebsiteCode } from "../../../../lib/schema"
+import { deployToVercel } from "../../../../lib/deploy-actions"
+import { useParams } from "next/navigation"
+import { getProjectById } from "@/app/lib/db"
 
 interface CodeDisplayProps {
   code: WebsiteCode
@@ -27,6 +29,8 @@ export default function CodeDisplay({ code }: CodeDisplayProps) {
   const [isDomainConnected, setIsDomainConnected] = useState(false)
   const [showDomainForm, setShowDomainForm] = useState(false)
   const [deploymentError, setDeploymentError] = useState<string | null>(null)
+
+  const {id}:any = useParams()
 
   console.log(
     "CodeDisplay received code structure:",
@@ -57,9 +61,14 @@ export default function CodeDisplay({ code }: CodeDisplayProps) {
   const handleDeploy = async () => {
     setIsDeploying(true)
 
+  
+
     try {
       // Call the server action to deploy to Vercel
-      const result = await deployToVercel(code)
+      if(!id){alert('No project ID.')}
+      
+    
+      const result = await deployToVercel(code, id)
 
       if (result.success && result.url) {
         setIsDeployed(true)

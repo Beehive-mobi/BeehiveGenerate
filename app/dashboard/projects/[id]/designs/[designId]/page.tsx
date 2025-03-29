@@ -3,7 +3,8 @@
 import * as React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { getDesignById, deleteDesign } from "@/app/lib/design-actions"
+//import { getDesignById, deleteDesign } from "@/app/lib/design-actions"
+import { fetchDesignDetails } from "@/app/lib/design-actions"
 import { getAllCodeVersionsForDesign, getWebsiteCodeByDesignId, deleteWebsiteCode } from "@/app/lib/code-actions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -63,22 +64,22 @@ export default function DesignDetailPage({ params }: PageProps) {
 
   useEffect(() => {
     const fetchDesign = async () => {
-      if (!id) return
+      if (!designId) return
 
       try {
-        const result = await getDesignById(id)
+        const result = await fetchDesignDetails(designId)
         if (result.success) {
           setDesign(result.design)
 
           // Fetch all code versions for this design
           try {
-            const versionsResult = await getAllCodeVersionsForDesign(id)
+            const versionsResult = await getAllCodeVersionsForDesign(designId)
             if (versionsResult.success) {
               setCodeVersions(versionsResult.codeVersions)
             }
 
             // Also fetch the latest code if it exists
-            const codeResult = await getWebsiteCodeByDesignId(id)
+            const codeResult = await getWebsiteCodeByDesignId(designId)
             if (codeResult.success) {
               setCode(codeResult.code)
             }
@@ -97,17 +98,17 @@ export default function DesignDetailPage({ params }: PageProps) {
     }
 
     fetchDesign()
-  }, [id])
+  }, [designId])
 
   const handleDeleteDesign = async () => {
-    if (!id) return
+    if (!designId) return
 
     if (!confirm("Are you sure you want to delete this design? This action cannot be undone.")) {
       return
     }
 
     try {
-      const result = await deleteDesign(id)
+      const result = await deleteDesign(designId)
 
       if (result.success) {
         toast({
@@ -195,7 +196,7 @@ export default function DesignDetailPage({ params }: PageProps) {
         })
 
         // Refresh the code versions list
-        const versionsResult = await getAllCodeVersionsForDesign(id)
+        const versionsResult = await getAllCodeVersionsForDesign(designId)
         if (versionsResult.success) {
           setCodeVersions(versionsResult.codeVersions)
         }
@@ -225,7 +226,7 @@ export default function DesignDetailPage({ params }: PageProps) {
           </Link>
         </Button>
         <Button className="bg-beehive-yellow text-beehive-black hover:bg-beehive-hover" asChild>
-          <Link href={`/dashboard/designs/${id}/code`}>
+          <Link href={`/dashboard/designs/${designId}/code`}>
             <Code className="mr-2 h-4 w-4" /> {code ? "View Full Code" : "Generate Code"}
           </Link>
         </Button>
@@ -581,7 +582,7 @@ export default function DesignDetailPage({ params }: PageProps) {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold">Generated Code Versions</h2>
               <Button className="bg-beehive-yellow text-beehive-black hover:bg-beehive-hover" asChild>
-                <Link href={`/dashboard/designs/${id}/code`}>
+                <Link href={`/dashboard/designs/${designId}/code`}>
                   <Code className="mr-2 h-4 w-4" /> Generate New Code
                 </Link>
               </Button>
@@ -644,7 +645,7 @@ export default function DesignDetailPage({ params }: PageProps) {
             Delete Design
           </Button>
           <Button className="bg-beehive-yellow text-beehive-black hover:bg-beehive-hover" asChild>
-            <Link href={`/dashboard/designs/${id}/code`}>
+            <Link href={`/dashboard/designs/${designId}/code`}>
               <Code className="mr-2 h-4 w-4" /> {code ? "View Full Code" : "Generate Code"}
             </Link>
           </Button>

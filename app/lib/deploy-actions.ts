@@ -17,6 +17,7 @@ export type VercelDeploymentResponse = {
   success: boolean
   url?: string
   errorMessage?: string
+  deployment?:any
 }
 
 export type WebsiteCode = {
@@ -34,6 +35,11 @@ export type WebsiteCode = {
  */
 export async function deployToVercel(code: WebsiteCode, projectId: number): Promise<VercelDeploymentResponse> {
   try {
+
+    const projectResult = await getProjectById(projectId)
+
+    const projectName = projectResult?.project?.name || ""
+
     // Prepare the deployment payload
     // In a real implementation, we would need to create actual files from the code
     // and create a project structure that Vercel can deploy
@@ -450,8 +456,10 @@ declare namespace NodeJS {
         buildCommand: "next build",
         outputDirectory: ".next",
       },
+      project: projectName
+
     }
-    console.log("Deploying to Vercel:", deploymentPayload)
+    //console.log("Deploying to Vercel:", deploymentPayload)
 
     // Make an API call to Vercel
     const response = await fetch("https://api.vercel.com/v13/deployments", {

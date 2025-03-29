@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import CodeDisplay from "@/app/onboarding/code-display"
+import CodeDisplay from "@/app/dashboard/projects/[id]/generate-design/code-display"
 import type { WebsiteCode } from "@/app/lib/schema"
 import { formatDistanceToNow } from "date-fns"
 
@@ -97,7 +97,7 @@ export default function CodeVersionPage({ params }: PageProps) {
       </div>
 
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Code Version #{id}</h1>
+        <h1 className="text-3xl font-bold">Code Version #{codeId}</h1>
       </div>
 
       <CodeDisplay code={code} />

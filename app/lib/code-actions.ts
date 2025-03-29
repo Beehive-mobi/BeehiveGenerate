@@ -236,10 +236,81 @@
 // }
 
 "use server"
-
+import { sql } from "./db"
 import { revalidatePath } from "next/cache"
 import { getCodeByProject, getCodeByDesign, getCodeById, saveCode, deleteCode, getDesignById } from "@/app/lib/db"
 import type { WebsiteCode } from "@/app/lib/schema"
+
+
+export async function getWebsiteCodeByDesignId(designId: string) {
+  try {
+    console.log("Fetching code for design ID:", designId)
+    const codeResult = await sql`
+      SELECT * FROM website_code WHERE design_id = ${designId}
+    `
+
+    if (codeResult.length === 0) {
+      console.log("No code found for design ID:", designId)
+      return { success: false, error: "Website code not found" }
+    }
+
+    const code = codeResult[0]
+    console.log("Code found with ID:", code.id)
+
+    // Parse nextjs_components if it's a string
+    let nextjsComponents = null
+    if (code.nextjs_components) {
+      try {
+        nextjsComponents =
+          typeof code.nextjs_components === "string" ? JSON.parse(code.nextjs_components) : code.nextjs_components
+        console.log("Successfully parsed nextjs_components")
+      } catch (e) {
+        console.error("Error parsing nextjs_components:", e)
+        nextjsComponents = { pages: [], components: [], styles: [] }
+      }
+    }
+
+    // Convert the database format back to the WebsiteCode format
+    const websiteCode: WebsiteCode = {
+      html: code.html || "",
+      css: code.css || "",
+      javascript: code.javascript || undefined,
+      nextjs: nextjsComponents || {
+        pages: [],
+        components: [],
+        styles: [],
+      },
+    }
+
+    console.log(
+      "Returning website code with structure:",
+      JSON.stringify(
+        {
+          html: typeof websiteCode.html,
+          css: typeof websiteCode.css,
+          javascript: typeof websiteCode.javascript,
+          nextjs: websiteCode.nextjs
+            ? {
+                pages: Array.isArray(websiteCode.nextjs.pages) ? websiteCode.nextjs.pages.length : "not array",
+                components: Array.isArray(websiteCode.nextjs.components)
+                  ? websiteCode.nextjs.components.length
+                  : "not array",
+                styles: Array.isArray(websiteCode.nextjs.styles) ? websiteCode.nextjs.styles.length : "not array",
+              }
+            : "undefined",
+        },
+        null,
+        2,
+      ),
+    )
+
+    return { success: true, code: websiteCode }
+  } catch (error) {
+    console.error("Error fetching website code:", error)
+    return { success: false, error }
+  }
+}
+
 
 export async function fetchCodeByProject(projectId: number) {
   try {

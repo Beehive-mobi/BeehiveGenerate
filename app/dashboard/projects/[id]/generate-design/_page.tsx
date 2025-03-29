@@ -9,11 +9,10 @@ import CompanyInfoForm from "./company-info-form"
 import ServiceInfoForm from "./service-info-form"
 import DesignPreferencesForm from "./design-preferences-form"
 import DesignResults from "./design-results"
-import { generateWebsiteDesigns } from "../lib/ai-service"
-import type { CompanyInfo, DesignPreferences, OnboardingData, ServiceInfo, WebsiteDesigns } from "../lib/schema"
+import { generateWebsiteDesigns } from "../../../../lib/ai-service"
+import type { CompanyInfo, DesignPreferences, OnboardingData, ServiceInfo, WebsiteDesigns } from "../../../../lib/schema"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
-import { initializeDatabase } from "../lib/db"
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -26,7 +25,6 @@ export default function OnboardingPage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [designs, setDesigns] = useState<WebsiteDesigns>([])
   const [error, setError] = useState<string | null>(null)
-  const [dbInitialized, setDbInitialized] = useState(false)
 
   const totalSteps = 4
   const progress = (step / totalSteps) * 100
@@ -39,18 +37,6 @@ export default function OnboardingPage() {
     } else if (step === 3) {
       const updatedFormData = { ...formData, designPreferences: data }
       setFormData(updatedFormData)
-
-      // Initialize database if not already done
-      // if (!dbInitialized) {
-      //   try {
-      //     const result = await initializeDatabase()
-      //     if (result.success) {
-      //       setDbInitialized(true)
-      //     }
-      //   } catch (error) {
-      //     console.error("Error initializing database:", error)
-      //   }
-      // }
 
       // Generate designs using AI
       setIsGenerating(true)
@@ -114,7 +100,7 @@ export default function OnboardingPage() {
           {step === 1 && <CompanyInfoForm onSubmit={handleNext} />}
           {step === 2 && <ServiceInfoForm onSubmit={handleNext} />}
           {step === 3 && <DesignPreferencesForm onSubmit={handleNext} />}
-          {step === 4 && <DesignResults designs={designs} onboardingData={formData} />}
+          {step === 4 && <DesignResults designs={designs} />}
 
           {isGenerating && (
             <div className="mt-6 text-center">

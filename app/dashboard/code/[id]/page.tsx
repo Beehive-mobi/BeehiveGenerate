@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import CodeDisplay from "@/app/onboarding/code-display"
+import CodeDisplay from "@/app/dashboard/projects/[id]/generate-design/code-display"
 import type { WebsiteCode } from "@/app/lib/schema"
 import { formatDistanceToNow } from "date-fns"
 

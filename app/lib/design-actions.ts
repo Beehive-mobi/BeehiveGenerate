@@ -1,4 +1,5 @@
-// import { sql } from "./db"
+"use server"
+import { sql } from "./db"
 // import type { WebsiteDesign, OnboardingData } from "./schema"
 
 // export async function saveDesign(design: WebsiteDesign, onboardingData: OnboardingData) {
@@ -80,11 +81,54 @@
 //   }
 // }
 
-"use server"
+
 
 import { revalidatePath } from "next/cache"
 import { getDesignsByProject, getDesignById, saveDesign, deleteDesign } from "@/app/lib/db"
 import type { WebsiteDesign, OnboardingData } from "@/app/lib/schema"
+
+
+export async function saveDesign1(project_id:number, design: WebsiteDesign, onboardingData: OnboardingData) {
+    try {
+      const result = await sql`
+        INSERT INTO designs (
+          user_id,
+          project_id,
+          company_name,
+          design_name,
+          description,
+          color_palette,
+          typography,
+          layout,
+          features,
+          image_style,
+          preview_images
+        ) VALUES (
+          'user123', -- Replace with actual user ID
+          ${project_id},
+          ${onboardingData.company.companyName},
+          ${design.name},
+          ${design.description},
+          ${JSON.stringify(design.colorPalette)},
+          ${JSON.stringify(design.typography)},
+          ${JSON.stringify(design.layout)},
+          ${JSON.stringify(design.features)},
+          ${design.imageStyle},
+          ${JSON.stringify({
+            desktop: design.previewImage,
+            mobile: design.mobilePreviewImage,
+            tablet: design.tabletPreviewImage,
+          })}
+        )
+        RETURNING id
+      `
+  
+      return { success: true, designId: result[0].id }
+    } catch (error) {
+      console.error("Error saving design:", error)
+      return { success: false, error }
+    }
+  }
 
 export async function fetchDesignsByProject(projectId: number) {
   try {

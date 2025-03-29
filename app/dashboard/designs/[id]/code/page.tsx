@@ -10,7 +10,7 @@ import { ArrowLeft, Code, Save, Trash } from "lucide-react"
 import Link from "next/link"
 import { generateWebsiteCode } from "@/app/lib/ai-code-generator"
 import { saveWebsiteCode, getWebsiteCodeByDesignId, deleteWebsiteCode } from "@/app/lib/code-actions"
-import CodeDisplay from "@/app/onboarding/code-display"
+import CodeDisplay from "@/app/dashboard/projects/[id]/generate-design/code-display"
 import type { WebsiteCode, WebsiteDesign } from "@/app/lib/schema"
 import { toast } from "@/hooks/use-toast"
 

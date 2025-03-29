@@ -1,7 +1,7 @@
 import { neon } from "@neondatabase/serverless"
 
 // Create a SQL client with the connection string from environment variables
-export const sql = neon(process.env.DATABASE_URL!)
+export const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL!)
 
 // Update the initializeDatabase function to include deployments and domains tables
 
@@ -488,13 +488,12 @@ export async function saveDeployment(deploymentData: {
       // Insert new deployment
       const [deployment] = await sql`
         INSERT INTO deployments (
-          project_id, deployment_id, url, status, created_at, response_data
+          project_id, deployment_id, url, status, response_data
         ) VALUES (
           ${project_id},
           ${deployment_id},
           ${url},
           ${status},
-          ${created_at || sql`CURRENT_TIMESTAMP`},
           ${JSON.stringify(response_data)}
         )
         RETURNING *

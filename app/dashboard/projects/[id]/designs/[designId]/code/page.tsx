@@ -3,14 +3,15 @@
 import * as React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { getDesignById } from "@/app/lib/design-actions"
+//import { getDesignById } from "@/app/lib/design-actions"
+import { fetchDesignDetails } from "@/app/lib/design-actions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, Code, Save, Trash } from "lucide-react"
 import Link from "next/link"
 import { generateWebsiteCode } from "@/app/lib/ai-code-generator"
-import { saveWebsiteCode, getWebsiteCodeByDesignId, deleteWebsiteCode } from "@/app/lib/code-actions"
-import CodeDisplay from "@/app/onboarding/code-display"
+import { saveWebsiteCode, getWebsiteCodeByDesignId, deleteWebsiteCode, saveWebsiteCodeFromFormat } from "@/app/lib/code-actions"
+import CodeDisplay from "@/app/dashboard/projects/[id]/generate-design/code-display"
 import type { WebsiteCode, WebsiteDesign } from "@/app/lib/schema"
 import { toast } from "@/hooks/use-toast"
 
@@ -22,7 +23,7 @@ interface PageProps {
 
 export default function DesignCodePage({ params }: PageProps) {
   const router = useRouter()
-  const { id } = React.use(params)
+  const { designId, id } = React.use(params)
   const [design, setDesign] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -35,21 +36,21 @@ export default function DesignCodePage({ params }: PageProps) {
 
   useEffect(() => {
     const fetchDesign = async () => {
-      if (!id) return
+      if (!designId) return
 
       try {
-        const result = await getDesignById(id)
+        const result = await fetchDesignDetails(designId)
         if (result.success) {
           setDesign(result.design)
 
           // Check if code already exists for this design
-          const codeResult = await getWebsiteCodeByDesignId(id)
+          const codeResult = await getWebsiteCodeByDesignId(designId)
           if (codeResult.success) {
-            console.log("Found existing code for design:", id)
+            console.log("Found existing code for design:", designId)
             setGeneratedCode(codeResult.code)
             setSavedCodeExists(true)
           } else {
-            console.log("No existing code found for design:", id)
+            console.log("No existing code found for design:", designId)
           }
         } else {
           setError("Failed to load design")
@@ -63,7 +64,7 @@ export default function DesignCodePage({ params }: PageProps) {
     }
 
     fetchDesign()
-  }, [id])
+  }, [designId])
 
   const handleGenerateCode = async () => {
     if (!design) return
@@ -114,12 +115,12 @@ export default function DesignCodePage({ params }: PageProps) {
   }
 
   const handleSaveCode = async (codeToSave: WebsiteCode = generatedCode!) => {
-    if (!codeToSave || !id) return
+    if (!codeToSave || !designId) return
 
     setIsSavingCode(true)
 
     try {
-      console.log("Saving code for design:", id)
+      console.log("Saving code for design:", designId)
       console.log(
         "Code to save structure:",
         JSON.stringify(
@@ -142,7 +143,7 @@ export default function DesignCodePage({ params }: PageProps) {
         ),
       )
 
-      const result = await saveWebsiteCode(id, codeToSave)
+      const result = await saveWebsiteCodeFromFormat(designId, codeToSave, id)
 
       if (result.success) {
         console.log("Code saved successfully with ID:", result.codeId)
@@ -172,7 +173,7 @@ export default function DesignCodePage({ params }: PageProps) {
   }
 
   const handleDeleteCode = async () => {
-    if (!id) return
+    if (!designId) return
 
     if (!confirm("Are you sure you want to delete this code? This action cannot be undone.")) {
       return
@@ -182,7 +183,7 @@ export default function DesignCodePage({ params }: PageProps) {
 
     try {
       console.log("Deleting code for design:", id)
-      const result = await deleteWebsiteCode(id)
+      const result = await deleteWebsiteCode(designId)
 
       if (result.success) {
         console.log("Code deleted successfully")
@@ -235,7 +236,7 @@ export default function DesignCodePage({ params }: PageProps) {
     <div className="container mx-auto py-8">
       <div className="flex items-center justify-between mb-6">
         <Button variant="outline" asChild>
-          <Link href={`/dashboard/designs/${id}`}>
+          <Link href={`/dashboard/designs/${designId}`}>
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Design
           </Link>
         </Button>

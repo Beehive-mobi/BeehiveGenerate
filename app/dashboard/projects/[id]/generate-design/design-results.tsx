@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Check, Download, Laptop, Smartphone, Tablet, Palette, Type, Layout, Code, Save } from "lucide-react"
-import type { WebsiteDesign, WebsiteCode, OnboardingData } from "../lib/schema"
-import { generateWebsiteCode } from "../lib/ai-code-generator"
-import { saveDesign } from "../lib/design-actions"
+import type { WebsiteDesign, WebsiteCode, OnboardingData } from "../../../../lib/schema"
+import { generateWebsiteCode } from "../../../../lib/ai-code-generator"
+import { createOrUpdateDesign, saveDesign1 } from "../../../../lib/design-actions"
+
 import CodeDisplay from "./code-display"
 import Image from "next/image"
 import { toast } from "@/hooks/use-toast"
+import { useParams } from "next/navigation"
 
 interface DesignResultsProps {
   designs: WebsiteDesign[]
@@ -25,6 +27,8 @@ export default function DesignResults({ designs, onboardingData }: DesignResults
   const [isSavingDesign, setIsSavingDesign] = useState(false)
   const [generatedCode, setGeneratedCode] = useState<WebsiteCode | null>(null)
   const [codeError, setCodeError] = useState<string | null>(null)
+
+  const { id }:any = useParams()
 
   const handleSelectDesign = (id: number) => {
     setSelectedDesign(id)
@@ -62,8 +66,9 @@ export default function DesignResults({ designs, onboardingData }: DesignResults
     setIsSavingDesign(true)
 
     try {
-      const result = await saveDesign(design, onboardingData)
-
+      if(!id){ alert('No project ID.')}
+      const result = await saveDesign1(id, design, onboardingData)
+      console.log(result)
       if (result.success) {
         toast({
           title: "Design saved",
