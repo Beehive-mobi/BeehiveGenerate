@@ -18,7 +18,7 @@ interface PageProps {
 
 export default function CodeVersionPage({ params }: PageProps) {
   const router = useRouter()
-  const { id } = React.use(params)
+  const { codeId } = React.use(params)
   const [code, setCode] = useState<WebsiteCode | null>(null)
   const [designId, setDesignId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -39,11 +39,11 @@ export default function CodeVersionPage({ params }: PageProps) {
 
   useEffect(() => {
     const fetchCodeVersion = async () => {
-      if (!id) return
+      if (!codeId) return
 
       try {
         // Fetch the specific code version by ID
-        const result = await fetch(`/api/code/${id}`)
+        const result = await fetch(`/api/code/${codeId}`)
         const data = await result.json()
 
         if (data.success) {
@@ -62,7 +62,7 @@ export default function CodeVersionPage({ params }: PageProps) {
     }
 
     fetchCodeVersion()
-  }, [id])
+  }, [codeId])
 
   if (isLoading) {
     return (

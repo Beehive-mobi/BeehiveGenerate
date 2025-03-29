@@ -3,20 +3,24 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { getDesigns } from "@/app/lib/design-actions"
+import { fetchDesignsByProject } from "@/app/lib/design-actions"
+//import { fetchDesignDetails } from "@/app/actions/design-actions"
+
 import Image from "next/image"
 import { Eye, Code } from "lucide-react"
 import Link from "next/link"
+import { useParams } from "next/navigation"
 
 export default function SavedDesignsPage() {
   const [designs, setDesigns] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { id } = useParams()
 
   useEffect(() => {
     const fetchDesigns = async () => {
       try {
-        const result = await getDesigns()
+        const result = await fetchDesignsByProject(id)
         if (result.success) {
           setDesigns(result.designs)
         } else {

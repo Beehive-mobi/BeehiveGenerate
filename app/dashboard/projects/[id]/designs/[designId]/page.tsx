@@ -37,7 +37,7 @@ interface PageProps {
 
 export default function DesignDetailPage({ params }: PageProps) {
   const router = useRouter()
-  const { id } = React.use(params)
+  const { designId } = React.use(params)
   const [design, setDesign] = useState<any>(null)
   const [code, setCode] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
