@@ -12,7 +12,7 @@ export default function DashboardPage() {
         <NewProjectForm />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle>Saved Designs</CardTitle>
@@ -80,7 +80,7 @@ export default function DashboardPage() {
             </Button>
           </CardFooter>
         </Card>
-      </div>
+      </div> */}
 
       <div className="mt-8">
         <Card>
