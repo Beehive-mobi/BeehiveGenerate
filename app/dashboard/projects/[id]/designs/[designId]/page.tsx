@@ -386,7 +386,7 @@ export default function DesignDetailPage({ params }: PageProps) {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold">Generated Code</h2>
               <Button className="bg-beehive-yellow text-beehive-black hover:bg-beehive-hover" asChild>
-                <Link href={`/dashboard/designs/${id}/code`}>
+                <Link href={`/dashboard/designs/${designId}/code`}>
                   <Code className="mr-2 h-4 w-4" /> View Full Code
                 </Link>
               </Button>
