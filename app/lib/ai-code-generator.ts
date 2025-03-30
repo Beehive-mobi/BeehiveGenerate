@@ -76,6 +76,8 @@ export async function generateWebsiteCode(design: WebsiteDesign): Promise<Websit
        - Pages: index.js, about.js, and _app.js
        - Components: Layout.js, Header.js, Footer.js, and components for each section
        - Styles: globals.css and tailwind.config.js
+
+    Always create Next.js implementation.
     
     Make sure the code is modern, responsive, accessible, and follows best practices.
     Make sure import componets and file name is imported correctly.

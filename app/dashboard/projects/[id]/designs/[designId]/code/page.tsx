@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, Code, Save, Trash } from "lucide-react"
 import Link from "next/link"
 import { generateWebsiteCode } from "@/app/lib/ai-code-generator"
-import { saveWebsiteCode, getWebsiteCodeByDesignId, deleteWebsiteCode, saveWebsiteCodeFromFormat } from "@/app/lib/code-actions"
+import { saveWebsiteCode, getWebsiteCodeByDesignId, deleteWebsiteCode, saveWebsiteCodeFromFormat, removeCode } from "@/app/lib/code-actions"
 import CodeDisplay from "@/app/dashboard/projects/[id]/generate-design/code-display"
 import type { WebsiteCode, WebsiteDesign } from "@/app/lib/schema"
 import { toast } from "@/hooks/use-toast"
@@ -182,8 +182,8 @@ export default function DesignCodePage({ params }: PageProps) {
     setIsDeletingCode(true)
 
     try {
-      console.log("Deleting code for design:", id)
-      const result = await deleteWebsiteCode(designId)
+      console.log("Deleting code for design:", designId)
+      const result = await removeCode(designId)
 
       if (result.success) {
         console.log("Code deleted successfully")
