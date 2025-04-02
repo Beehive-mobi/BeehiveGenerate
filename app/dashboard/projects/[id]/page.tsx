@@ -11,10 +11,12 @@ import { fetchDeploymentsByProject } from "@/app/lib/deploy-actions"
 import { fetchDomainsByProject } from "@/app/lib/domain-actions"
 import { DeleteProjectButton } from "@/components/delete-project-button"
 import { AddDomainForm } from "@/components/add-domain-form"
-import { ArrowLeft, ExternalLink, Palette, FileCode, Rocket, Globe } from "lucide-react"
+import { ArrowLeft, ExternalLink, Palette, FileCode, Rocket, Globe } from 'lucide-react'
 
-export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
-  const id = Number.parseInt(params.id)
+export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  // Await the params object before accessing its properties
+  const { id: idString } = await params
+  const id = Number.parseInt(idString)
 
   if (isNaN(id)) {
     return notFound()
