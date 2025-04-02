@@ -1,16 +1,15 @@
-import { CardFooter } from "@/components/ui/card"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
 import { fetchProjectDetails } from "@/app/lib/project-actions"
 import { fetchDesignsByProject } from "@/app/lib/design-actions"
 import { fetchCodeByProject } from "@/app/lib/code-actions"
 import { fetchDeploymentsByProject } from "@/app/lib/deploy-actions"
 import { fetchDomainsByProject } from "@/app/lib/domain-actions"
 import { DeleteProjectButton } from "@/components/delete-project-button"
-//import { NewDesignForm } from "@/components/new-design-form"
 import { AddDomainForm } from "@/components/add-domain-form"
 import { ArrowLeft, ExternalLink, Palette, FileCode, Rocket, Globe } from "lucide-react"
 
@@ -42,6 +41,12 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
 
   const domainsResult = await fetchDomainsByProject(id)
   const domains = domainsResult.success ? domainsResult.domains : []
+
+  // Get the most recent items from each category
+  const mostRecentDeployment = deployments.length > 0 ? deployments[0] : null
+  const mostRecentDesign = designs.length > 0 ? designs[0] : null
+  const mostRecentCode = codeItems.length > 0 ? codeItems[0] : null
+  const mostRecentDomain = domains.length > 0 ? domains[0] : null
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -86,36 +91,35 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
 
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Deployments</h3>
-                {deployments.length > 0 ? (
+                {mostRecentDeployment ? (
                   <div className="space-y-4">
-                    {deployments.slice(0, 3).map((deployment) => (
-                      <Card key={deployment.id}>
+                    {/* Clickable card with Latest tag */}
+                    <Link href={`/dashboard/projects/${id}/deployments/${mostRecentDeployment.id}`}>
+                      <Card className="border-2 border-black hover:bg-muted/50 transition-colors">
                         <CardContent className="p-4">
                           <div className="flex justify-between items-center">
                             <div>
-                              <p className="font-medium">{deployment.url}</p>
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium">{mostRecentDeployment.url}</p>
+                                <Badge variant="outline" className="border-black text-black font-semibold">
+                                  Latest
+                                </Badge>
+                              </div>
                               <p className="text-sm text-muted-foreground">
-                                Created: {new Date(deployment.created_at).toLocaleString()}
+                                Created: {new Date(mostRecentDeployment.created_at).toLocaleString()}
                               </p>
                             </div>
-                            <Button variant="outline" size="sm" asChild>
-                              <a href={`https://${deployment.url}`} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4 mr-2" />
-                                Visit
-                              </a>
-                            </Button>
+                            <ExternalLink className="h-4 w-4" />
                           </div>
                         </CardContent>
                       </Card>
-                    ))}
+                    </Link>
 
-                    {deployments.length > 3 && (
-                      <div className="text-center pt-2">
-                        <Button asChild variant="outline">
-                          <Link href={`/dashboard/projects/${id}/deployments`}>View All Deployments</Link>
-                        </Button>
-                      </div>
-                    )}
+                    <div className="text-center pt-2">
+                      <Button asChild variant="outline">
+                        <Link href={`/dashboard/projects/${id}/deployments`}>View All Deployments</Link>
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <p className="text-muted-foreground">No deployments found</p>
@@ -133,36 +137,32 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
               {/* <NewDesignForm projectId={id} /> */}
             </CardHeader>
             <CardContent>
-              {designs.length === 0 ? (
+              {!mostRecentDesign ? (
                 <div className="flex flex-col items-center justify-center py-6">
                   <Palette className="h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-muted-foreground mb-4">No designs found for this project</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {designs.slice(0, 3).map((design) => (
-                    <Card key={design.id}>
+                  {/* Clickable card with Latest tag */}
+                  <Link href={`/dashboard/projects/${id}/designs/${mostRecentDesign.id}`}>
+                    <Card className="border-2 border-black hover:bg-muted/50 transition-colors">
                       <CardContent className="p-4">
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="font-medium">{design.design_name}</p>
-                            <p className="text-sm text-muted-foreground">{design.company_name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{mostRecentDesign.design_name}</p>
+                              <Badge variant="outline" className="border-black text-black font-semibold">
+                                Latest
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{mostRecentDesign.company_name}</p>
                           </div>
-                          <Button asChild size="sm">
-                            <Link href={`/dashboard/projects/${id}/designs/${design.id}`}>View Design</Link>
-                          </Button>
+                          <Palette className="h-4 w-4" />
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
-
-                  {designs.length > 3 && (
-                    <div className="text-center pt-2">
-                      <Button asChild variant="outline">
-                        <Link href={`/dashboard/projects/${id}/designs`}>View All Designs</Link>
-                      </Button>
-                    </div>
-                  )}
+                  </Link>
                 </div>
               )}
             </CardContent>
@@ -181,38 +181,34 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
               <CardDescription>Code generated for this project</CardDescription>
             </CardHeader>
             <CardContent>
-              {codeItems.length === 0 ? (
+              {!mostRecentCode ? (
                 <div className="flex flex-col items-center justify-center py-6">
                   <FileCode className="h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-muted-foreground mb-4">No code has been generated for this project yet</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {codeItems.slice(0, 3).map((code) => (
-                    <Card key={code.id}>
+                  {/* Clickable card with Latest tag */}
+                  <Link href={`/dashboard/projects/${id}/code/${mostRecentCode.id}`}>
+                    <Card className="border-2 border-black hover:bg-muted/50 transition-colors">
                       <CardContent className="p-4">
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="font-medium">{code.design_name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{mostRecentCode.design_name}</p>
+                              <Badge variant="outline" className="border-black text-black font-semibold">
+                                Latest
+                              </Badge>
+                            </div>
                             <p className="text-sm text-muted-foreground">
-                              Created: {new Date(code.created_at).toLocaleString()}
+                              Created: {new Date(mostRecentCode.created_at).toLocaleString()}
                             </p>
                           </div>
-                          <Button asChild size="sm">
-                            <Link href={`/dashboard/projects/${id}/code/${code.id}`}>View Code</Link>
-                          </Button>
+                          <FileCode className="h-4 w-4" />
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
-
-                  {codeItems.length > 3 && (
-                    <div className="text-center pt-2">
-                      <Button asChild variant="outline">
-                        <Link href={`/dashboard/projects/${id}/code`}>View All Code</Link>
-                      </Button>
-                    </div>
-                  )}
+                  </Link>
                 </div>
               )}
             </CardContent>
@@ -234,38 +230,34 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
               <AddDomainForm projectId={id} />
             </CardHeader>
             <CardContent>
-              {domains.length === 0 ? (
+              {!mostRecentDomain ? (
                 <div className="flex flex-col items-center justify-center py-6">
                   <Globe className="h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-muted-foreground mb-4">No domains found for this project</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {domains.slice(0, 3).map((domain) => (
-                    <Card key={domain.id}>
+                  {/* Clickable card with Latest tag */}
+                  <Link href={`/dashboard/projects/${id}/domains/${mostRecentDomain.id}`}>
+                    <Card className="border-2 border-black hover:bg-muted/50 transition-colors">
                       <CardContent className="p-4">
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="font-medium">{domain.name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{mostRecentDomain.name}</p>
+                              <Badge variant="outline" className="border-black text-black font-semibold">
+                                Latest
+                              </Badge>
+                            </div>
                             <p className="text-sm text-muted-foreground">
-                              {domain.verified ? "Verified" : "Not Verified"}
+                              {mostRecentDomain.verified ? "Verified" : "Not Verified"}
                             </p>
                           </div>
-                          <Button asChild size="sm">
-                            <Link href={`/dashboard/projects/${id}/domains/${domain.id}`}>View Domain</Link>
-                          </Button>
+                          <Globe className="h-4 w-4" />
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
-
-                  {domains.length > 3 && (
-                    <div className="text-center pt-2">
-                      <Button asChild variant="outline">
-                        <Link href={`/dashboard/projects/${id}/domains`}>View All Domains</Link>
-                      </Button>
-                    </div>
-                  )}
+                  </Link>
                 </div>
               )}
             </CardContent>
