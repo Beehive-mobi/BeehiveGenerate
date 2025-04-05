@@ -236,7 +236,7 @@ export default function DesignCodePage({ params }: PageProps) {
     <div className="container mx-auto py-8">
       <div className="flex items-center justify-between mb-6">
         <Button variant="outline" asChild>
-          <Link href={`/dashboard/designs/${designId}`}>
+          <Link href={`/dashboard/projects/${id}/designs/${designId}`}>
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Design
           </Link>
         </Button>

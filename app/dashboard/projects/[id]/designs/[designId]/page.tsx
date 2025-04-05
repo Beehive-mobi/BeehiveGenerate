@@ -38,7 +38,7 @@ interface PageProps {
 
 export default function DesignDetailPage({ params }: PageProps) {
   const router = useRouter()
-  const { designId } = React.use(params)
+  const { designId, id } = React.use(params)
   const [design, setDesign] = useState<any>(null)
   const [code, setCode] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -221,12 +221,12 @@ export default function DesignDetailPage({ params }: PageProps) {
     <div className="container mx-auto py-8">
       <div className="flex items-center justify-between mb-6">
         <Button variant="outline" asChild>
-          <Link href="/dashboard/saved-designs">
+          <Link href={`/dashboard/projects/${id}/designs`}>
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Saved Designs
           </Link>
         </Button>
         <Button className="bg-beehive-yellow text-beehive-black hover:bg-beehive-hover" asChild>
-          <Link href={`/dashboard/designs/${designId}/code`}>
+          <Link href={`/dashboard/projects/${id}/designs/${designId}/code`}>
             <Code className="mr-2 h-4 w-4" /> {code ? "View Full Code" : "Generate Code"}
           </Link>
         </Button>
@@ -633,7 +633,7 @@ export default function DesignDetailPage({ params }: PageProps) {
       )}
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={() => router.push("/dashboard/saved-designs")}>
+        <Button variant="outline" onClick={() => router.push(`/dashboard/projects/${id}/designs`)}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Saved Designs
         </Button>
         <div className="space-x-4">

@@ -15,7 +15,7 @@ export default function SavedDesignsPage() {
   const [designs, setDesigns] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { id } = useParams()
+  const { id, designId } = useParams()
 
   useEffect(() => {
     const fetchDesigns = async () => {
@@ -92,7 +92,7 @@ export default function SavedDesignsPage() {
                 </CardContent>
                 <CardFooter className="flex justify-between p-4">
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/dashboard/designs/${design.id}`}>
+                    <Link href={`/dashboard/projects/${id}/designs/${design.id}`}>
                       <Eye className="mr-2 h-4 w-4" /> View
                     </Link>
                   </Button>
@@ -102,7 +102,7 @@ export default function SavedDesignsPage() {
                     className="bg-beehive-yellow text-beehive-black hover:bg-beehive-hover"
                     asChild
                   >
-                    <Link href={`/dashboard/designs/${design.id}/code`}>
+                    <Link href={`/dashboard/projects/${id}/designs/${design.id}/code`}>
                       <Code className="mr-2 h-4 w-4" /> Generate Code
                     </Link>
                   </Button>
